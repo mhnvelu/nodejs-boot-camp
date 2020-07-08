@@ -21,13 +21,17 @@ app.use((req, res, next) => {
 });
 
 app.use(adminRoutes);
+app.use(shopRoutes);
 
 app.use("/user", (req, res, next) => {
   console.log("Handled /user endpoint");
   res.send("<h2>Response from user endpoint</h2>");
 });
 
-app.use(shopRoutes);
+app.use("/", (req, res, next) => {
+  console.log("Error endpoint");
+  res.status(404).send("<h2>Page not found !!!</h2>");
+});
 
 // const server = http.createServer(app);
 // server.listen(3000);
