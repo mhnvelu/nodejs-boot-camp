@@ -8,6 +8,10 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// Middleware from express allows to provide read access to css files
+// This is not handled by routes.
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use((req, res, next) => {
   console.log("-----------------------");
   console.log("In Middleware 1");
