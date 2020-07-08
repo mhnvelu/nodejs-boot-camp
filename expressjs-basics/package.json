@@ -1,0 +1,23 @@
+{
+  "name": "expressjs-basics",
+  "version": "1.0.0",
+  "description": "Express js basics",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mhnvelu/nodejs-boot-camp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mhnvelu/nodejs-boot-camp/issues"
+  },
+  "homepage": "https://github.com/mhnvelu/nodejs-boot-camp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
