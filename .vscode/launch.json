@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [{
         "name": "Launch Program",
-        "program": "${workspaceFolder}/basics/app.js",
+        "program": "${workspaceFolder}/nodejs-basics/app.js",
         "request": "launch",
         "type": "node",
         "restart": true,
