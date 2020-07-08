@@ -20,7 +20,7 @@ app.use((req, res, next) => {
   //   res.send("<h2>Response from Middleware 2</h2>");
 });
 
-app.use(adminRoutes);
+app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use("/user", (req, res, next) => {
