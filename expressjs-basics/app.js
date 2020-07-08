@@ -1,4 +1,5 @@
 // const http = require("http");
+const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const adminRoutes = require("./routes/admin");
@@ -30,7 +31,7 @@ app.use("/user", (req, res, next) => {
 
 app.use("/", (req, res, next) => {
   console.log("Error endpoint");
-  res.status(404).send("<h2>Page not found !!!</h2>");
+  res.status(404).sendFile(path.join(__dirname, "views", "error.html"));
 });
 
 // const server = http.createServer(app);
