@@ -6,8 +6,15 @@ const adminData = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const app = express();
 
+// Template engine - handlebar
+// Handlebar expects main.handlebars in /views/layouts/ dir
+const expressHbs = require("express-handlebars");
+app.engine("hbs", expressHbs());
+app.set("view engine", "hbs");
+// hbs will be the file extension for other html files. we can use any name.
+
 // set pug as view engine
-app.set("view engine", "pug");
+// app.set("view engine", "pug");
 //views configuration is needed only when directory is different.
 app.set("views", "views");
 
@@ -40,7 +47,7 @@ app.use("/user", (req, res, next) => {
 
 app.use("/", (req, res, next) => {
   console.log("Error endpoint");
-  res.status(404).render("error");
+  res.status(404).render("error", { pageTitle: "Error" });
 });
 
 // const server = http.createServer(app);
