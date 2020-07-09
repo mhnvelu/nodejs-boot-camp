@@ -2,7 +2,7 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
-const adminRoutes = require("./routes/admin");
+const adminData = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const app = express();
 
@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   //   res.send("<h2>Response from Middleware 2</h2>");
 });
 
-app.use("/admin", adminRoutes);
+app.use("/admin", adminData.router);
 app.use(shopRoutes);
 
 app.use("/user", (req, res, next) => {
@@ -40,7 +40,7 @@ app.use("/user", (req, res, next) => {
 
 app.use("/", (req, res, next) => {
   console.log("Error endpoint");
-  res.status(404).sendFile(path.join(__dirname, "views", "error.html"));
+  res.status(404).render("error");
 });
 
 // const server = http.createServer(app);
