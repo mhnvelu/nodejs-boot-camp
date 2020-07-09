@@ -4,8 +4,8 @@ const router = express.Router();
 const rootDir = require("../utils/path");
 
 router.get("/", (req, res, next) => {
-  console.log("Handled root endpoint");
-  res.sendFile(path.join(rootDir, "views", "shop.html"));
+  console.log("Handled by / endpoint");
+  res.render("shop");
 });
 
 module.exports = router;

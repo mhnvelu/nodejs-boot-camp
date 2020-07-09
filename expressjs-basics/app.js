@@ -6,6 +6,11 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const app = express();
 
+// set pug as view engine
+app.set("view engine", "pug");
+//views configuration is needed only when directory is different.
+app.set("views", "views");
+
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Middleware from express allows to provide read access to css files
