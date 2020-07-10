@@ -4,18 +4,22 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const adminData = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const usersData = require("./routes/users");
 const app = express();
 
 // Template engine - handlebar
 // Handlebar expects main.handlebars in /views/layouts/ dir
-const expressHbs = require("express-handlebars");
-app.engine("hbs", expressHbs());
-app.set("view engine", "hbs");
+// const expressHbs = require("express-handlebars");
+// app.engine("hbs", expressHbs());
+// app.set("view engine", "hbs");
 // hbs will be the file extension for other html files. we can use any name.
 
 // set pug as view engine
 // app.set("view engine", "pug");
 //views configuration is needed only when directory is different.
+
+// set ejs as view engine
+app.set("view engine", "ejs");
 app.set("views", "views");
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -37,13 +41,9 @@ app.use((req, res, next) => {
   //   res.send("<h2>Response from Middleware 2</h2>");
 });
 
-app.use("/admin", adminData.router);
+app.use("/admin", adminData.router, usersData.router);
 app.use(shopRoutes);
-
-app.use("/user", (req, res, next) => {
-  console.log("Handled /user endpoint");
-  res.send("<h2>Response from user endpoint</h2>");
-});
+// app.use("/admin", usersData.router);
 
 app.use("/", (req, res, next) => {
   console.log("Error endpoint");
