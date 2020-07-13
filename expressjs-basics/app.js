@@ -2,8 +2,9 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
-const adminData = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const errorController = require("./controllers/error");
 const usersData = require("./routes/users");
 const app = express();
 
@@ -41,14 +42,11 @@ app.use((req, res, next) => {
   //   res.send("<h2>Response from Middleware 2</h2>");
 });
 
-app.use("/admin", adminData.router, usersData.router);
+app.use("/admin", adminRoutes, usersData.router);
 app.use(shopRoutes);
 // app.use("/admin", usersData.router);
 
-app.use("/", (req, res, next) => {
-  console.log("Error endpoint");
-  res.status(404).render("error", { pageTitle: "Error" });
-});
+app.use("/", errorController.get404);
 
 // const server = http.createServer(app);
 // server.listen(3000);
