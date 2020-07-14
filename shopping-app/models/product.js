@@ -10,7 +10,7 @@ const p = path.join(
 
 const getProductsFromFile = (cb) => {
   fs.readFile(p, (err, fileContent) => {
-    if (err) {
+    if (err || fileContent.length == 0) {
       cb([]);
     } else {
       cb(JSON.parse(fileContent));
@@ -19,7 +19,8 @@ const getProductsFromFile = (cb) => {
 };
 
 module.exports = class Product {
-  constructor(title, imageUrl, description, price) {
+  constructor(id, title, imageUrl, description, price) {
+    this.id = id;
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
@@ -27,12 +28,22 @@ module.exports = class Product {
   }
 
   save() {
-    this.id = uuidv4();
     getProductsFromFile((products) => {
-      products.push(this);
-      fs.writeFile(p, JSON.stringify(products), (err) => {
-        console.log(err);
-      });
+      if (this.id) {
+        let existingProductIndex = products.findIndex(
+          (product) => this.id === product.id
+        );
+        products[existingProductIndex] = this;
+        fs.writeFile(p, JSON.stringify(products), (err) => {
+          if (err) console.log(err);
+        });
+      } else {
+        this.id = uuidv4();
+        products.push(this);
+        fs.writeFile(p, JSON.stringify(products), (err) => {
+          if (err) console.log(err);
+        });
+      }
     });
   }
 
