@@ -62,8 +62,16 @@ exports.addToCart = (req, res, next) => {
   let productId = req.body.productId;
   Product.findById(productId, (product) => {
     Cart.addProduct(productId, product.price);
+    res.redirect("/cart");
   });
-  res.redirect("/cart");
+};
+
+exports.deleteItemFromCart = (req, res, next) => {
+  let productId = req.body.productId;
+  Product.findById(productId, (product) => {
+    Cart.deleteproduct(productId, product.price);
+    res.redirect("/cart");
+  });
 };
 
 exports.getOrders = (req, res, next) => {
