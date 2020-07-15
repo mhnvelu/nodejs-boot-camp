@@ -1,29 +1,26 @@
-const db = require("../../util/database");
+const Sequelize = require("sequelize");
+const sequelize = require("../../util/database");
 
-module.exports = class Product {
-  constructor(id, title, imageUrl, description, price) {
-    this.id = id;
-    this.title = title;
-    this.imageUrl = imageUrl;
-    this.description = description;
-    this.price = price;
-  }
+const Product = sequelize.define("product", {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  title: Sequelize.STRING,
+  price: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  imageUrl: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
 
-  save() {
-    return db.execute(
-      "INSERT INTO product (title,price,description,imageUrl) VALUES(?,?,?,?)",
-      [this.title, this.price, this.description, this.imageUrl]
-    );
-  }
-
-  static fetchAll() {
-    // This returns a Promise object
-    return db.execute("select * from product");
-  }
-
-  static findById(productId) {
-    return db.execute("select * from product where id=?", [productId]);
-  }
-
-  static delete(productId) {}
-};
+module.exports = Product;
