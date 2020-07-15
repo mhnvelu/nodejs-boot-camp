@@ -11,6 +11,8 @@ const Product = require("./models/db/product");
 const User = require("./models/db/user");
 const Cart = require("./models/db/cart");
 const CartItem = require("./models/db/cartItem");
+const Order = require("./models/db/order");
+const OrderItem = require("./models/db/orderItem");
 
 const app = express();
 
@@ -49,6 +51,12 @@ Cart.belongsTo(User);
 //many-to-many
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+
+//user-order-product associations
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderItem });
+Product.belongsToMany(Order, { through: OrderItem });
 
 // creates Tables for all the models defined if not present.
 sequelize
