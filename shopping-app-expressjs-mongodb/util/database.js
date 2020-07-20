@@ -1,19 +1,26 @@
-// const mysql = require("mysql2");
-// const pool = mysql.createPool({
-//   host: process.env.HOST,
-//   user: process.env.USER,
-//   database: process.env.DB,
-//   password: process.env.PASSWORD,
-// });
+const mongodb = require("mongodb");
+const MongoClient = mongodb.MongoClient;
 
-// module.exports = pool.promise();
+let _db;
+const mongoConnect = (cb) => {
+  MongoClient.connect(
+    `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}/${process.env.DB}?retryWrites=true&w=majority`,
+    { useUnifiedTopology: true }
+  )
+    .then((client) => {
+      console.log("Connected to DB");
+      _db = client.db();
+      cb();
+    })
+    .catch((err) => console.log("ERROR", err));
+};
 
-const Sequelize = require("sequelize");
-const sequelize = new Sequelize(
-  process.env.DB,
-  process.env.USER,
-  process.env.PASSWORD,
-  { dialect: "mysql", host: "localhost" }
-);
+const getDb = () => {
+  if (_db) {
+    return _db;
+  }
+  throw Error("No DB Found!");
+};
 
-module.exports = sequelize;
+module.exports.mongoConnect = mongoConnect;
+module.exports.getDb = getDb;
