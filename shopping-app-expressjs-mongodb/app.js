@@ -3,16 +3,11 @@ require("dotenv").config();
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+// const { mongoConnect } = require("./util/database");
 
-// const errorController = require("./controllers/error");
-const { mongoConnect } = require("./util/database");
-
-// const Product = require("./models/db/product");
-const User = require("./models/user");
-// const Cart = require("./models/db/cart");
-// const CartItem = require("./models/db/cartItem");
-// const Order = require("./models/db/order");
-// const OrderItem = require("./models/db/orderItem");
+// const User = require("./models/user");
+const User = require("./models/mongoose/user");
 
 const app = express();
 
@@ -26,20 +21,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findByName("test")
+  User.findOne({ username: "test" })
     .then((user) => {
       if (user) {
-        req.user = new User(user.username, user.email, user._id, user.cart);
+        req.user = user;
       } else {
-        const userData = new User("test", "test@gmail.com");
+        const userData = new User({
+          username: "test",
+          email: "test@gmail.com",
+          cart: { items: [] },
+        });
         return userData.save();
       }
     })
     .then((user) => {
-      User.findByName("test").then(
-        (user) =>
-          (req.user = new User(user.username, user.email, user._id, user.cart))
-      );
+      User.findOne({ username: "test" }).then((user) => (req.user = user));
       next();
     })
     .catch((err) => console.log(err));
@@ -48,8 +44,19 @@ app.use((req, res, next) => {
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
-// app.use(errorController.get404);
+//using mongoose
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}/${process.env.DB}?retryWrites=true&w=majority`,
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
+  .then((result) => {
+    console.log("Connected to DB");
+    app.listen(3000);
+  })
+  .catch((err) => console.log(err));
 
-mongoConnect(() => {
-  app.listen(3000);
-});
+//using mongodb driver
+// mongoConnect(() => {
+//   app.listen(3000);
+// });
