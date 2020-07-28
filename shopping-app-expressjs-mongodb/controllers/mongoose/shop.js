@@ -52,7 +52,7 @@ exports.addToCart = (req, res, next) => {
   let productId = req.body.productId;
   Product.findById(productId)
     .then((product) => {
-      return req.session.user.addToCart(product);
+      return req.user.addToCart(product);
     })
     .then((result) => {
       console.log("Added to cart");
@@ -64,7 +64,7 @@ exports.addToCart = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.sesssion.user
+  req.user
     .populate("cart.items.product")
     .execPopulate()
     .then((user) => {
@@ -90,7 +90,7 @@ exports.getCart = (req, res, next) => {
 
 exports.deleteItemFromCart = (req, res, next) => {
   let productId = req.body.productId;
-  req.session.user
+  req.user
     .deleteItemFromCart(productId)
     .then((result) => {
       res.redirect("/cart");
@@ -127,7 +127,7 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-  req.session.user
+  req.user
     .addOrder()
     .then((result) => res.redirect("/orders"))
     .catch((err) => {

@@ -10,27 +10,16 @@ exports.getLogin = (req, res, next) => {
 
 exports.postLogin = (req, res, next) => {
   // res.setHeader("Set-Cookie", "loggedIn=true");
-  req.session.loggedIn = true;
+
   User.findOne({ username: "test" })
     .then((user) => {
-      if (user) {
-        req.session.user = user;
-      } else {
-        const userData = new User({
-          username: "test",
-          email: "test@gmail.com",
-          cart: { items: [] },
-        });
-        return userData.save();
-      }
-    })
-    .then((user) => {
-      User.findOne({ username: "test" }).then(
-        (user) => (req.session.user = user)
-      );
+      req.session.loggedIn = true;
+      req.session.user = user;
+      req.session.save((err) => {
+        res.redirect("/");
+      });
     })
     .catch((err) => console.log("err", err));
-  res.redirect("/");
 };
 
 exports.postLogout = (req, res, next) => {

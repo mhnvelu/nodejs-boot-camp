@@ -29,7 +29,7 @@ userSchema.methods.addToCart = function (product) {
   let newQuantity = 1;
   if (this.cart) {
     const cartProductIndex = this.cart.items.findIndex(
-      (cp) => cp.productId.toString() === product._id.toString()
+      (cp) => cp.product.toString() === product._id.toString()
     );
     const updatedCartItems = [...this.cart.items];
     if (cartProductIndex >= 0) {
