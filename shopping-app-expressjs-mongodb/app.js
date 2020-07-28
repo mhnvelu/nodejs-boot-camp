@@ -5,6 +5,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 const mongoose = require("mongoose");
 // const { mongoConnect } = require("./util/database");
 
@@ -12,6 +13,10 @@ const mongoose = require("mongoose");
 const User = require("./models/mongoose/user");
 
 const app = express();
+const sessionStore = new MongoDBStore({
+  uri: `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}/${process.env.DB}?retryWrites=true&w=majority`,
+  collection: "sessions",
+});
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -22,31 +27,15 @@ const authRoutes = require("./routes/auth");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(
-  session({ secret: "mysecret", resave: false, saveUninitialized: false })
+  session({
+    secret: "mysecret",
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+  })
 );
-
-app.use((req, res, next) => {
-  User.findOne({ username: "test" })
-    .then((user) => {
-      if (user) {
-        req.user = user;
-      } else {
-        const userData = new User({
-          username: "test",
-          email: "test@gmail.com",
-          cart: { items: [] },
-        });
-        return userData.save();
-      }
-    })
-    .then((user) => {
-      User.findOne({ username: "test" }).then((user) => (req.user = user));
-      next();
-    })
-    .catch((err) => console.log(err));
-});
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
