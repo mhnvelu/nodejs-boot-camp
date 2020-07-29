@@ -12,6 +12,7 @@ const mongoose = require("mongoose");
 // const User = require("./models/user");
 const User = require("./models/mongoose/user");
 const isAuth = require("./middleware/isAuth");
+const csrf = require("csurf");
 
 const app = express();
 const sessionStore = new MongoDBStore({
@@ -38,6 +39,10 @@ app.use(
   })
 );
 
+// add csrf protection after session middleware bz csurf uses it
+const csrfProtection = csrf();
+app.use(csrfProtection);
+
 app.use((req, res, next) => {
   if (!req.session.user) {
     return next();
@@ -48,6 +53,13 @@ app.use((req, res, next) => {
       next();
     })
     .catch((err) => console.log("err", err));
+});
+
+// Adding csrf token to all pages.
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.loggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 app.use("/admin", isAuth, adminRoutes);
