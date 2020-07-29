@@ -11,15 +11,29 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  // res.setHeader("Set-Cookie", "loggedIn=true");
+  const email = req.body.email;
+  const password = req.body.password;
 
-  User.findOne({ username: "test" })
+  User.findOne({ email: email })
     .then((user) => {
-      req.session.loggedIn = true;
-      req.session.user = user;
-      req.session.save((err) => {
-        res.redirect("/");
-      });
+      if (!user) {
+        return res.redirect("/login");
+      }
+
+      bcrypt
+        .compare(password, user.password)
+        .then((doMatch) => {
+          if (doMatch) {
+            req.session.loggedIn = true;
+            req.session.user = user;
+            req.session.save((err) => {
+              res.redirect("/");
+            });
+          } else {
+            res.redirect("/login");
+          }
+        })
+        .catch((err) => res.redirect("/login"));
     })
     .catch((err) => console.log("err", err));
 };
