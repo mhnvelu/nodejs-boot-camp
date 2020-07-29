@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 
 // const User = require("./models/user");
 const User = require("./models/mongoose/user");
+const isAuth = require("./middleware/isAuth");
 
 const app = express();
 const sessionStore = new MongoDBStore({
@@ -49,7 +50,7 @@ app.use((req, res, next) => {
     .catch((err) => console.log("err", err));
 });
 
-app.use("/admin", adminRoutes);
+app.use("/admin", isAuth, adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 

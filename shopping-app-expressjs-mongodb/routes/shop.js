@@ -4,6 +4,8 @@ const express = require("express");
 
 const shopController = require("../controllers/mongoose/shop");
 
+const isAuth = require("../middleware/isAuth");
+
 const router = express.Router();
 
 router.get("/", shopController.getIndex);
@@ -12,14 +14,14 @@ router.get("/products", shopController.getProducts);
 
 router.get("/products/:id", shopController.getProductDetails);
 
-router.get("/cart", shopController.getCart);
+router.get("/cart", isAuth, shopController.getCart);
 
-router.post("/cart", shopController.addToCart);
+router.post("/cart", isAuth, shopController.addToCart);
 
-router.post("/cart-delete-item", shopController.deleteItemFromCart);
+router.post("/cart-delete-item", isAuth, shopController.deleteItemFromCart);
 
-router.get("/orders", shopController.getOrders);
+router.get("/orders", isAuth, shopController.getOrders);
 
-router.post("/create-order", shopController.postOrder);
+router.post("/create-order", isAuth, shopController.postOrder);
 
 module.exports = router;
