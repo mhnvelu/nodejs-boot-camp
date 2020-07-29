@@ -13,6 +13,7 @@ const mongoose = require("mongoose");
 const User = require("./models/mongoose/user");
 const isAuth = require("./middleware/isAuth");
 const csrf = require("csurf");
+const connectFlash = require("connect-flash");
 
 const app = express();
 const sessionStore = new MongoDBStore({
@@ -42,6 +43,7 @@ app.use(
 // add csrf protection after session middleware bz csurf uses it
 const csrfProtection = csrf();
 app.use(csrfProtection);
+app.use(connectFlash());
 
 app.use((req, res, next) => {
   if (!req.session.user) {

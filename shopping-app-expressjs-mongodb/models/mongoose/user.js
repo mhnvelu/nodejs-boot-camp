@@ -79,7 +79,7 @@ userSchema.methods.addOrder = function () {
       });
       const order = new Order({
         user: {
-          name: this.username,
+          email: this.email,
           userId: this,
         },
         items: products,

@@ -2,22 +2,29 @@ const bcrypt = require("bcryptjs");
 const User = require("../../models/mongoose/user");
 
 exports.getLogin = (req, res, next) => {
-  console.log(req.session.loggedIn);
+  // Once error is read, it will be removed from session
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/login", {
     path: "/login",
     pageTitle: "Login",
-    isAuthenticated: false,
+    errorMessage: message,
   });
 };
 
 exports.postLogin = (req, res, next) => {
-  console.log(req.body);
   const email = req.body.email;
   const password = req.body.password;
 
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
+        //This error message will be used in subsequent /login page. This gets added to session
+        req.flash("error", "Invalid email or password");
         return res.redirect("/login");
       }
 
@@ -31,6 +38,7 @@ exports.postLogin = (req, res, next) => {
               res.redirect("/");
             });
           } else {
+            req.flash("error", "Invalid email or password");
             res.redirect("/login");
           }
         })
@@ -46,10 +54,16 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
-    isAuthenticated: false,
+    errorMessage: message,
   });
 };
 
@@ -60,6 +74,7 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email: email })
     .then((user) => {
       if (user) {
+        req.flash("error", "Email already exists");
         return res.redirect("/signup");
       }
       return bcrypt
