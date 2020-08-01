@@ -1,5 +1,15 @@
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+const sendGridTransport = require("nodemailer-sendgrid-transport");
 const User = require("../../models/mongoose/user");
+
+const transporter = nodemailer.createTransport(
+  sendGridTransport({
+    auth: {
+      api_key: process.env.SEND_GRID_API_KEY,
+    },
+  })
+);
 
 exports.getLogin = (req, res, next) => {
   // Once error is read, it will be removed from session
@@ -87,7 +97,16 @@ exports.postSignup = (req, res, next) => {
           });
           return newUser.save();
         })
-        .then((result) => res.redirect("/login"));
+        .then((result) => {
+          res.redirect("/login");
+          return transporter.sendMail({
+            to: email,
+            from: "shop@node-complete.com",
+            subject: "Signup succeeded!!!",
+            html: "<h1> Successfully signed up!</h1>",
+          });
+        })
+        .catch((err) => console.log(err));
     })
 
     .catch((err) => console.log(err));
