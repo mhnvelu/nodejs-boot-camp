@@ -3,6 +3,7 @@ const nodemailer = require("nodemailer");
 const sendGridTransport = require("nodemailer-sendgrid-transport");
 const crypto = require("crypto");
 const User = require("../../models/mongoose/user");
+const { validationResult } = require("express-validator/check");
 
 const transporter = nodemailer.createTransport(
   sendGridTransport({
@@ -82,34 +83,36 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
-  User.findOne({ email: email })
-    .then((user) => {
-      if (user) {
-        req.flash("error", "Email already exists");
-        return res.redirect("/signup");
-      }
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const newUser = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] },
-          });
-          return newUser.save();
-        })
-        .then((result) => {
-          res.redirect("/login");
-          return transporter.sendMail({
-            to: email,
-            from: "shop@node-complete.com",
-            subject: "Signup succeeded!!!",
-            html: "<h1> Successfully signed up!</h1>",
-          });
-        })
-        .catch((err) => console.log(err));
-    })
 
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("ERROR : ", errors.array());
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      errorMessage: errors.array()[0].msg,
+    });
+  }
+
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const newUser = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return newUser.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+      return transporter.sendMail({
+        to: email,
+        from: "shop@node-complete.com",
+        subject: "Signup succeeded!!!",
+        html: "<h1> Successfully signed up!</h1>",
+      });
+    })
     .catch((err) => console.log(err));
 };
 
