@@ -8,13 +8,17 @@ router.get("/login", authController.getLogin);
 
 router.post(
   "/login",
-  check("email").isEmail().withMessage("Please enter a valid email"),
+  check("email")
+    .isEmail()
+    .withMessage("Please enter a valid email")
+    .normalizeEmail(),
   body(
     "password",
     "Please enter a password with only alphabets, numbers and atleast 5 characters"
   )
     .isLength({ min: 5 })
-    .isAlphanumeric(),
+    .isAlphanumeric()
+    .trim(),
   authController.postLogin
 );
 
@@ -29,6 +33,7 @@ router.post(
   check("email")
     .isEmail()
     .withMessage("Please enter a valid email")
+    .normalizeEmail()
     .custom((value, { req }) => {
       // Adding Async Validation.
       return User.findOne({ email: value }).then((user) => {
@@ -42,13 +47,16 @@ router.post(
     "Please enter a password with only alphabets, numbers and atleast 5 characters"
   )
     .isLength({ min: 5 })
-    .isAlphanumeric(),
-  body("confirmPassword").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Passwords have to match!");
-    }
-    return true;
-  }),
+    .isAlphanumeric()
+    .trim(),
+  body("confirmPassword")
+    .trim()
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Passwords have to match!");
+      }
+      return true;
+    }),
   authController.postSignup
 );
 
