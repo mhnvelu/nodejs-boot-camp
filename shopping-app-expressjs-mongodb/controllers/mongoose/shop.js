@@ -12,7 +12,9 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -26,7 +28,9 @@ exports.getIndex = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -41,7 +45,9 @@ exports.getProductDetails = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -56,7 +62,9 @@ exports.addToCart = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -80,7 +88,9 @@ exports.getCart = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -92,7 +102,9 @@ exports.deleteItemFromCart = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -117,7 +129,9 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -126,6 +140,8 @@ exports.postOrder = (req, res, next) => {
     .addOrder()
     .then((result) => res.redirect("/orders"))
     .catch((err) => {
-      console.log("err", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
