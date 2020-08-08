@@ -8,7 +8,7 @@ router.get("/add-product", adminController.getAddProduct);
 router.post(
   "/add-product",
   body("title", "Invalid Title").trim().isLength({ min: 3 }).isString(),
-  body("imageUrl", "Invalid image url").isURL(),
+  body("image", "Invalid image"),
   body("price", "Invalid Price").isFloat(),
   body("description", "Invalid Description")
     .trim()
@@ -21,7 +21,7 @@ router.get("/edit-product/:productId", adminController.getEditProduct);
 router.post(
   "/edit-product/",
   body("title", "Invalid Title").trim().isLength({ min: 3 }).isString(),
-  body("imageUrl", "Invalid image url").isURL(),
+  body("image", "Invalid image"),
   body("price", "Invalid Price").isFloat(),
   body("description", "Invalid Description")
     .trim()
