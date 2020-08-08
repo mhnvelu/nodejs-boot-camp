@@ -1,5 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
 const Product = require("../../models/mongoose/product");
 const User = require("../../models/mongoose/user");
 const Order = require("../../models/mongoose/order");
@@ -148,34 +149,67 @@ exports.postOrder = (req, res, next) => {
     });
 };
 
-exports.getOrderInvoice = (req,res,next) => {
+exports.getOrderInvoice = (req, res, next) => {
   const orderId = req.params.orderId;
 
-Order.findById(orderId).then(order => {
-   if(!order){
-    return next(new Error("Order not found!"));
-  }
-  if(order.user.userId.toString() !== req.user._id.toString()){
-    return next(new Error("Unauthorized!"));
-  }
-  const invoiceName = 'Invoice-'+orderId+'.pdf';
-  const invoicePath = path.join('data','invoices',invoiceName);
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return next(new Error("Order not found!"));
+      }
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error("Unauthorized!"));
+      }
+      const invoiceName = "Invoice-" + orderId + ".pdf";
+      const invoicePath = path.join("data", "invoices", invoiceName);
 
-  //Option 1 : Whole file is read into memory and served.
-  // fs.readFile(invoicePath,(err,data) => {
-  //   if(err) {
-  //  return  next(err);
-  //   }
-  //   res.setHeader('Content-Type','application/pdf');
-  //   res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
-  //   // res.setHeader('Content-Disposition','attachment; filename="'+invoiceName+'"');
-  //   res.send(data);  
-  // });
+      //Option 1 : Whole file is read into memory and served.
+      // fs.readFile(invoicePath,(err,data) => {
+      //   if(err) {
+      //  return  next(err);
+      //   }
+      //   res.setHeader('Content-Type','application/pdf');
+      //   res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
+      //   // res.setHeader('Content-Disposition','attachment; filename="'+invoiceName+'"');
+      //   res.send(data);
+      // });
 
-    //Option 2 : File is read in chunks and served.
-    const file = fs.createReadStream(invoicePath);
-    res.setHeader('Content-Type','application/pdf');
-    res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
-    file.pipe(res);
-}).catch(err => next(err))
-}
+      //Option 2 : File is read in chunks and served.
+      // const file = fs.createReadStream(invoicePath);
+      // res.setHeader('Content-Type','application/pdf');
+      // res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
+      // file.pipe(res);
+
+      //Option 3: Generate PDF
+      const pdfDoc = new PDFDocument();
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename="' + invoiceName + '"'
+      );
+      pdfDoc.pipe(res);
+      pdfDoc.fontSize(26).text("Invoice", { underline: true });
+      pdfDoc.text("--------------------------------------");
+      let totalPrice = 0;
+      order.items.forEach((item) => {
+        totalPrice += item.quantity * item.product.price;
+        pdfDoc
+          .fontSize(14)
+          .text(
+            item.product.title +
+              " - " +
+              item.quantity +
+              " x " +
+              "$" +
+              item.product.price
+          );
+      });
+      pdfDoc.text(
+        "------------------------------------------------------------"
+      );
+      pdfDoc.fontSize(20).text("Total Price: $" + totalPrice);
+      pdfDoc.end();
+    })
+    .catch((err) => next(err));
+};
