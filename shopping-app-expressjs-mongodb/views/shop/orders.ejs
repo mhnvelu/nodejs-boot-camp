@@ -10,10 +10,10 @@
         <ul>
             <% orders.forEach(order => { %>
             <li>
-                <h1>Order id #<%= order._id %> </h1>
+                <h1>Order id #<%= order._id %> - <a href="/orders/<%= order._id%>">Invoice<a></a> </h1>
                 <ul>
                     <% order.items.forEach(product => { %>
-                    <li> <%= product.title %> (<%= product.quantity%>)  - <a href="/orders/<%= order._id%>">Invoice</li>
+                    <li> <%= product.title %> (<%= product.quantity%>)</li>
                     <% }) %>
                 </ul>
             </li>

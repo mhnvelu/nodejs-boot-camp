@@ -180,7 +180,7 @@ exports.getOrderInvoice = (req, res, next) => {
       // res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
       // file.pipe(res);
 
-      //Option 3: Generate PDF
+      //Option 3: Generate PDF and stream to client
       const pdfDoc = new PDFDocument();
       pdfDoc.pipe(fs.createWriteStream(invoicePath));
       res.setHeader("Content-Type", "application/pdf");
