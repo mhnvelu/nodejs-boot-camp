@@ -160,14 +160,22 @@ Order.findById(orderId).then(order => {
   }
   const invoiceName = 'Invoice-'+orderId+'.pdf';
   const invoicePath = path.join('data','invoices',invoiceName);
-  fs.readFile(invoicePath,(err,data) => {
-    if(err) {
-   return  next(err);
-    }
+
+  //Option 1 : Whole file is read into memory and served.
+  // fs.readFile(invoicePath,(err,data) => {
+  //   if(err) {
+  //  return  next(err);
+  //   }
+  //   res.setHeader('Content-Type','application/pdf');
+  //   res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
+  //   // res.setHeader('Content-Disposition','attachment; filename="'+invoiceName+'"');
+  //   res.send(data);  
+  // });
+
+    //Option 2 : File is read in chunks and served.
+    const file = fs.createReadStream(invoicePath);
     res.setHeader('Content-Type','application/pdf');
     res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
-    // res.setHeader('Content-Disposition','attachment; filename="'+invoiceName+'"');
-    res.send(data);
-  });
+    file.pipe(res);
 }).catch(err => next(err))
 }
