@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const Product = require("../../models/mongoose/product");
 const User = require("../../models/mongoose/user");
 const Order = require("../../models/mongoose/order");
@@ -145,3 +147,27 @@ exports.postOrder = (req, res, next) => {
       return next(error);
     });
 };
+
+exports.getOrderInvoice = (req,res,next) => {
+  const orderId = req.params.orderId;
+
+Order.findById(orderId).then(order => {
+   if(!order){
+    return next(new Error("Order not found!"));
+  }
+  if(order.user.userId.toString() !== req.user._id.toString()){
+    return next(new Error("Unauthorized!"));
+  }
+  const invoiceName = 'Invoice-'+orderId+'.pdf';
+  const invoicePath = path.join('data','invoices',invoiceName);
+  fs.readFile(invoicePath,(err,data) => {
+    if(err) {
+   return  next(err);
+    }
+    res.setHeader('Content-Type','application/pdf');
+    res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
+    // res.setHeader('Content-Disposition','attachment; filename="'+invoiceName+'"');
+    res.send(data);
+  });
+}).catch(err => next(err))
+}
