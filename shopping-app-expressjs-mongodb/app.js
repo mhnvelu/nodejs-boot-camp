@@ -54,11 +54,13 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-app.use(multer({ storage : fileStorage, fileFilter : fileFilter }).single("image"));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 
 //By default, Serves the files from this directory but as if files are in root directory /
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/images',express.static(path.join(__dirname, "images")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 // app.use(cookieParser());
 app.use(
   session({
@@ -108,6 +110,8 @@ app.use(errorController.get404);
 
 //Error Handling Middleware
 app.use((error, req, res, next) => {
+  console.log(error);
+
   res.status(500).render("500", {
     pageTitle: "Internal Server Error",
     path: "/500",
