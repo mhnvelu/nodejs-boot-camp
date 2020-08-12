@@ -137,6 +137,28 @@ exports.updatePost = (req, res, next) => {
 
 exports.deletePost = (req, res, next) => {
   const postId = req.params.postId;
+  Post.findById(postId)
+    .then((post) => {
+      if (!post) {
+        const error = new Error("Post not found");
+        error.statusCode = 404;
+        throw error;
+      }
+      deleteImage(post.imageUrl);
+      return Post.findByIdAndRemove(postId);
+    })
+    .then((result) => {
+      console.log(result);
+      res.status(200).json({
+        message: "Post deleted successfully",
+      });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        error.statusCode = 500;
+      }
+      next(err);
+    });
 };
 
 const deleteImage = (imagePath) => {
