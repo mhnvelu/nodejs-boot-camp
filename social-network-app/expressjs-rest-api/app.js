@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
 
 const feedRoutes = require("./routes/feed");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 app.use(bodyParser.json());
@@ -44,10 +45,14 @@ app.use((req, res, next) => {
 });
 
 app.use("/feed", feedRoutes);
+app.use("/auth", authRoutes);
 
 app.use((err, req, res, next) => {
   console.log(err);
-  res.status(err.statusCode || 500).json({ message: err.message });
+  const errorData = err.data;
+  res
+    .status(err.statusCode || 500)
+    .json({ message: err.message, data: errorData });
 });
 
 //using mongoose
