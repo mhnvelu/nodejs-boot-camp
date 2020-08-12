@@ -9,6 +9,7 @@ router.get("/posts", isAuth, feedController.getPosts);
 
 router.post(
   "/post",
+  isAuth,
   body("title", "Invalid Title").trim().isLength({ min: 5 }).isString(),
   body("content", "Invalid Content")
     .trim()
@@ -21,6 +22,7 @@ router.get("/post/:postId", isAuth, feedController.getPost);
 
 router.put(
   "/post/:postId",
+  isAuth,
   body("title", "Invalid Title").trim().isLength({ min: 5 }).isString(),
   body("content", "Invalid Content")
     .trim()
@@ -29,6 +31,6 @@ router.put(
   feedController.updatePost
 );
 
-router.delete("/post/:postId", feedController.deletePost);
+router.delete("/post/:postId", isAuth, feedController.deletePost);
 
 module.exports = router;
