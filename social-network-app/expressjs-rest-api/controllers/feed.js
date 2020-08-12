@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const Post = require("../models/post");
 const User = require("../models/user");
+const user = require("../models/user");
 
 exports.getPosts = (req, res, next) => {
   const currentPage = +req.query.page || 1;
@@ -185,13 +186,20 @@ exports.deletePost = (req, res, next) => {
     })
     .then((result) => {
       console.log(result);
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      user.posts.pull(postId);
+      return user.save();
+    })
+    .then((result) => {
       res.status(200).json({
         message: "Post deleted successfully",
       });
     })
     .catch((err) => {
       if (!err.statusCode) {
-        error.statusCode = 500;
+        err.statusCode = 500;
       }
       next(err);
     });
