@@ -63,6 +63,10 @@ mongoose
   )
   .then((result) => {
     console.log("Connected to DB");
-    app.listen(8080);
+    const server = app.listen(8080);
+    const io = require("./websocket").init(server);
+    io.on("connection", (socket) => {
+      console.log("Client connected!!!");
+    });
   })
   .catch((err) => console.log(err));
