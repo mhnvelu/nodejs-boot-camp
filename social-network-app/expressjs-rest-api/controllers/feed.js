@@ -15,6 +15,7 @@ exports.getPosts = async (req, res, next) => {
     const posts = await Post.find()
       .populate("creator", "name")
       .skip((currentPage - 1) * POSTS_PER_PAGE)
+      .sort({ createdAt: -1 })
       .limit(POSTS_PER_PAGE);
     res.status(200).json({
       message: "Posts fetched successfully",
@@ -186,6 +187,11 @@ exports.deletePost = async (req, res, next) => {
     const user = await User.findById(req.userId);
     user.posts.pull(postId);
     await user.save();
+
+    io.getIO().emit("posts", {
+      action: "delete",
+      post: postId,
+    });
 
     res.status(200).json({
       message: "Post deleted successfully",
