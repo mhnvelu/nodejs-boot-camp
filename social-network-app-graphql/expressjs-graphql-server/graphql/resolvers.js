@@ -104,7 +104,7 @@ module.exports = {
     const post = new Post({
       title: postInput.title,
       content: postInput.content,
-      imageUrl: "someurl",
+      imageUrl: postInput.imageUrl,
       creator: user,
     });
 
@@ -119,14 +119,25 @@ module.exports = {
     };
   },
 
-  getPosts: async (args, req) => {
+  getPosts: async ({ page }, req) => {
     if (!req.isAuth) {
       const error = new Error("User not authenticated");
       error.code = 401;
       throw error;
     }
+
+    if (!page) {
+      page = 1;
+    }
+
+    const perPage = 2;
+
     const totalPosts = await Post.find().countDocuments();
-    const posts = await Post.find().sort({ createdAt: -1 }).populate("creator");
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate("creator");
 
     //graphql doesnt understand _id, date from post. so we need to convert them into string
     return {
@@ -138,6 +149,82 @@ module.exports = {
         };
       }),
       totalPosts: totalPosts,
+    };
+  },
+
+  getPost: async ({ id }, req) => {
+    if (!req.isAuth) {
+      const error = new Error("User not authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const post = await Post.findById(id).populate("creator");
+    if (!post) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+
+    return {
+      ...post._doc,
+      _id: post._id.toString(),
+      createdAt: post.createdAt.toISOString(),
+    };
+  },
+
+  updatePost: async ({ id, postInput }, req) => {
+    if (!req.isAuth) {
+      const error = new Error("User not authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const post = await Post.findById(id).populate("creator");
+    if (!post) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+
+    if (req.userId.toString() !== post.creator._id.toString()) {
+      const error = new Error("User not Authorized");
+      error.code = 403;
+      throw error;
+    }
+
+    const errors = [];
+    if (validator.isEmpty(postInput.title)) {
+      errors.push({ message: "Title is invalid" });
+    }
+    if (validator.isEmpty(postInput.content)) {
+      errors.push({ message: "Content is invalid" });
+    }
+    if (validator.isEmpty(postInput.imageUrl)) {
+      errors.push({ message: "Image not uploaded" });
+    }
+
+    if (errors.length > 0) {
+      const error = new Error("Invalid Input");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+
+    post.title = postInput.title;
+    post.content = postInput.content;
+
+    if (postInput.imageUrl !== "undefined") {
+      post.imageUrl = postInput.imageUrl;
+    }
+
+    const updatedPost = await post.save();
+
+    return {
+      ...updatedPost._doc,
+      _id: updatedPost._id.toString(),
+      createdAt: updatedPost.createdAt.toISOString(),
+      updatedAt: updatedPost.updatedAt.toISOString(),
     };
   },
 };

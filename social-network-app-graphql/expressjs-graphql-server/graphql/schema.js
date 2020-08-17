@@ -45,12 +45,14 @@ type AuthData {
 
 type RootQuery {
     login(email: String!, password: String!): AuthData!
-    getPosts : PostData!
+    getPosts(page : Int) : PostData!
+    getPost(id : ID!) : Post!
 }
 
  type RootMutation {
      createUser(userInput : UserInputData) : User!
      createPost(postInput : PostInputData) : Post!
+     updatePost(id : ID!, postInput : PostInputData) : Post!
  }
 
  schema {

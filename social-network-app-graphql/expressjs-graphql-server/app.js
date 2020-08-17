@@ -1,4 +1,5 @@
 const express = require("express");
+const fs = require("fs");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -50,6 +51,27 @@ app.use((req, res, next) => {
 
 app.use(auth);
 
+app.put("/post-image", (req, res, next) => {
+  if (!req.isAuth) {
+    throw new Error("Not Authenticated");
+  }
+
+  if (!req.file) {
+    return res.status(200).json("No image uploaded");
+  }
+
+  if (req.body.oldPath) {
+    deleteImage(req.body.oldPath);
+  }
+
+  const filePath = req.file.path.replace("\\", "/");
+
+  return res.status(201).json({
+    message: "File stored",
+    filePath: filePath,
+  });
+});
+
 app.use(
   "/graphql",
   graphqlHTTP({
@@ -88,3 +110,12 @@ mongoose
     app.listen(8080);
   })
   .catch((err) => console.log(err));
+
+const deleteImage = (imagePath) => {
+  imagePath = path.join(__dirname, imagePath);
+  fs.unlink(imagePath, (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
+};
