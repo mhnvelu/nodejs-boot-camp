@@ -118,10 +118,13 @@ class Feed extends Component {
     event.preventDefault();
     let graphqlQuery = {
       query: `
-      mutation {
-        updateStatus(status : "${this.state.status}") {status}
+      mutation UpdateUserStatus($userStatus : String!) {
+        updateStatus(status : $userStatus) {status}
       }      
       `,
+      variables: {
+        userStatus: this.state.status,
+      },
     };
     fetch("http://localhost:8080/graphql", {
       method: "POST",
@@ -138,7 +141,6 @@ class Feed extends Component {
         if (resData.errors) {
           throw new Error("Failed to update user status");
         }
-        console.log(resData);
       })
       .catch(this.catchError);
   };
