@@ -1,5 +1,4 @@
 const express = require("express");
-const fs = require("fs");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -10,6 +9,7 @@ const { graphqlHTTP } = require("express-graphql");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
 const auth = require("./middleware/auth");
+const { deleteImage } = require("./util/file");
 
 const app = express();
 app.use(bodyParser.json());
@@ -110,12 +110,3 @@ mongoose
     app.listen(8080);
   })
   .catch((err) => console.log(err));
-
-const deleteImage = (imagePath) => {
-  imagePath = path.join(__dirname, imagePath);
-  fs.unlink(imagePath, (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
-};
