@@ -12,6 +12,11 @@ type Post {
     updatedAt: String!
 }
 
+type PostData {
+    posts: [Post!]!
+    totalPosts : Int!
+}
+
 type User {
     _id: ID!
     name: String!
@@ -27,6 +32,12 @@ input UserInputData {
     password: String!
 }
 
+input PostInputData {
+    title : String!
+    content : String!
+    imageUrl : String!
+}
+
 type AuthData {
     token : String!
     userId : String!
@@ -34,10 +45,12 @@ type AuthData {
 
 type RootQuery {
     login(email: String!, password: String!): AuthData!
+    getPosts : PostData!
 }
 
  type RootMutation {
      createUser(userInput : UserInputData) : User!
+     createPost(postInput : PostInputData) : Post!
  }
 
  schema {
