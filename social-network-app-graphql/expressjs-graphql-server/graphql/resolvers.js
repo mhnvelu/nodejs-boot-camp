@@ -147,6 +147,7 @@ module.exports = {
           ...post._doc,
           _id: post._id.toString(),
           createdAt: post.createdAt.toISOString(),
+          updatedAt: post.updatedAt.toISOString(),
         };
       }),
       totalPosts: totalPosts,
