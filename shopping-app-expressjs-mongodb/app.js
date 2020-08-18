@@ -8,6 +8,7 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const mongoose = require("mongoose");
 const multer = require("multer");
+const helmet = require("helmet");
 // const { mongoConnect } = require("./util/database");
 
 // const User = require("./models/user");
@@ -30,6 +31,7 @@ const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 const errorController = require("./controllers/mongoose/error");
 
+app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //multi-part data - multer
