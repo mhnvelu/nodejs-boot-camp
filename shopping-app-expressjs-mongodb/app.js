@@ -1,6 +1,7 @@
 const path = require("path");
 require("dotenv").config();
 const fs = require("fs");
+const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -24,6 +25,9 @@ const sessionStore = new MongoDBStore({
   uri: `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}/${process.env.DB}?retryWrites=true&w=majority`,
   collection: "sessions",
 });
+
+const privateKey = fs.readFileSync("server.key");
+const certificate = fs.readFileSync("server.cert");
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -138,6 +142,10 @@ mongoose
   )
   .then((result) => {
     console.log("Connected to DB");
+    // https
+    //   .createServer({ key: privateKey, cert: certificate }, app)
+    //   .listen(process.env.PORT || 3000);
+
     app.listen(process.env.PORT || 3000);
   })
   .catch((err) => console.log(err));
