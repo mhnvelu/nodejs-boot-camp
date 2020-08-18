@@ -1,0 +1,11 @@
+{
+    "env": {
+        "HOST": "cluster0.rtasn.mongodb.net",
+        "USER": "mongodb",
+        "PASSWORD": "tKU8NRu3xidNIL38",
+        "DB": "shop",
+        "SEND_GRID_API_KEY": "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",
+        "STRIPE_PUBLIC_KEY": "pk_test_B7j1QAVl9x9Bd62AjvJHHrdL00LIkJJXBf",
+        "STRIPE_SECRET_KEY": "sk_test_K4vb6ZO5Eqxwlar4n6j5AtDj004rFcqUy5"
+    }
+}
