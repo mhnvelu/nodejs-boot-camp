@@ -26,8 +26,9 @@ const sessionStore = new MongoDBStore({
   collection: "sessions",
 });
 
-const privateKey = fs.readFileSync("server.key");
-const certificate = fs.readFileSync("server.cert");
+// Get HTTPS through Heroku managed server
+// const privateKey = fs.readFileSync("server.key");
+// const certificate = fs.readFileSync("server.cert");
 
 app.set("view engine", "ejs");
 app.set("views", "views");
