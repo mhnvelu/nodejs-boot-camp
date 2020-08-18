@@ -1,6 +1,6 @@
 const path = require("path");
 require("dotenv").config();
-
+const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const helmet = require("helmet");
 const compression = require("compression");
+const morgan = require("morgan");
 // const { mongoConnect } = require("./util/database");
 
 // const User = require("./models/user");
@@ -34,6 +35,12 @@ const errorController = require("./controllers/mongoose/error");
 
 app.use(helmet());
 app.use(compression());
+
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+app.use(morgan("combined", { stream: accessLogStream }));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //multi-part data - multer
