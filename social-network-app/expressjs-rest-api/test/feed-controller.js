@@ -1,10 +1,12 @@
 const expect = require("chai").expect;
 const sinon = require("sinon");
 const User = require("../models/user");
-const AuthController = require("../controllers/auth");
+const FeedController = require("../controllers/feed");
 const mongoose = require("mongoose");
+const post = require("../models/post");
 require("dotenv").config();
-describe("Auth Controller Testing", () => {
+const io = require("../websocket");
+describe("Feed Controller Testing", () => {
   before(function (done) {
     mongoose
       .connect(
@@ -26,30 +28,18 @@ describe("Auth Controller Testing", () => {
       });
   });
 
-  it("should throw an error with code 500 if DB access fails", (done) => {
-    sinon.stub(User, "findOne");
-    User.findOne.throws();
-
+  it("should add a created post to the posts of creator", (done) => {
     const req = {
       body: {
-        email: "test@test.com",
-        password: "test1",
+        title: "post1",
+        content: "post1 content",
+      },
+      userId: "569ed8269353e9f4c51617aa",
+      file: {
+        path: "images/post1",
       },
     };
 
-    AuthController.login(req, {}, () => {}).then((result) => {
-      expect(result).to.be.an("error");
-      expect(result).to.have.property("statusCode", 500);
-      done();
-    });
-
-    User.findOne.restore();
-  });
-
-  it("should send a response with a valid user status for an existing user", (done) => {
-    const req = {
-      userId: "569ed8269353e9f4c51617aa",
-    };
     const res = {
       statusCode: 500,
       userStatus: null,
@@ -58,18 +48,25 @@ describe("Auth Controller Testing", () => {
         return this;
       },
       json: function (data) {
-        this.userStatus = data.status;
+        this.message = data.message;
       },
     };
-    AuthController.getUserStatus(req, res, () => {}).then((result) => {
-      expect(res.statusCode).equal(200);
-      expect(res.userStatus).to.be.equal("I am NEW!");
+
+    sinon.stub(io, "getIO");
+    io.getIO.returns({ emit: function () {} });
+
+    FeedController.createPost(req, res, () => {}).then((savedUser) => {
+      expect(savedUser.posts).to.have.length(1);
+      io.getIO.restore();
       done();
     });
   });
 
   after(function (done) {
     User.deleteMany({})
+      .then(() => {
+        return post.deleteMany({});
+      })
       .then(() => {
         return mongoose.disconnect();
       })
