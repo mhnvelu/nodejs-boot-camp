@@ -23,4 +23,14 @@ describe("Auth Middleware Unit Test", () => {
 
     expect(authMiddleware.bind(this, req, {}, () => {})).to.throw();
   });
+
+  it("should throw an error if toekn cannot be verified", () => {
+    const req = {
+      get: (headerName) => {
+        return "Bearer xyz";
+      },
+    };
+
+    expect(authMiddleware.bind(this, req, {}, () => {})).to.throw();
+  });
 });
